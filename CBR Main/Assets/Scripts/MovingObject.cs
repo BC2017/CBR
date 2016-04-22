@@ -1,0 +1,42 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public abstract class MovingObject : MonoBehaviour {
+
+	public float moveTime = 0.1f;
+	public LayerMask blockingLayer;
+
+	private BoxCollider2D boxCollider;
+	private Rigidbody2D rb2D;
+	private float inverseMoveTime;
+
+	protected virtual void Start() 
+	{
+		boxCollider = GetComponent<BoxCollider2D> ();
+
+		rb2D = GetComponent <Rigidbody2D> ();
+
+		inverseMoveTime = 1f / moveTime;
+	}
+
+	protected bool Move (int xDir, int yDir, out RaycastHit2D hit)
+	{
+		Vector2 start = transform.position;
+
+		Vector2 end = start + new Vector2 (xDir, yDir);
+
+		boxCollider.enabled = false;
+
+		hit = Physics2D.Linecast(start, end, blockingLayer);
+
+		boxCollider.enabled = true;
+
+		if (hit.transform == null) 
+		{
+			StartCoroutine (SmoothMovement (end));
+		}
+
+
+	}
+
+}
